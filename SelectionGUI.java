@@ -23,15 +23,17 @@ public class SelectionGUI extends JFrame {
 	private char shipGridX;
 	private String shipGridY;
 	
-	private boolean ifFinished  = false;
+	private boolean ifFinished;
 	
 	private List<Image> ships = new ArrayList<Image>();
 	private static ArrayList<Coord> shipLocations = new ArrayList<Coord>();
+	private static ArrayList<String> shipCoordinates = new ArrayList<String>();
+	private static ArrayList<String> orientations = new ArrayList<String>();
 	
 	private static int confirmed = 0;
 	private static int currentShip = 0;
 
-	private static String input = "";
+	private static String title = "";
 	private static String name  = "";
 
 	private static boolean selectingAirship    = true;
@@ -63,6 +65,7 @@ public class SelectionGUI extends JFrame {
 
 
 	public SelectionGUI() {
+		ifFinished = false;
 		setTitle("Battleship");
 		setSize(1600, 900);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -74,12 +77,12 @@ public class SelectionGUI extends JFrame {
 		addMouseListener(new MouseAction());
 
 		if(name == "") {
-			input = JOptionPane.showInputDialog(this, "What is your name?");
+			name = JOptionPane.showInputDialog(this, "What is your name?");
 			
-			while(input.length() <= 1 || input.length() > 10) 
-				input = JOptionPane.showInputDialog(this, "Choose a name in between 2-10 characters");
+			while(name.length() <= 1 || name.length() > 10) 
+				name = JOptionPane.showInputDialog(this, "Choose a name in between 2-10 characters");
 			
-			name = "Welcome " + input + "! Pick your locations:";
+			title = "Welcome " + name + "! Pick your locations:";
 		}
 	}
 
@@ -87,7 +90,11 @@ public class SelectionGUI extends JFrame {
 		return ifFinished;
 	}
 
-	public String getPlayer() {
+	public String getTitle() {
+		return title;
+	}
+
+	public String getName() {
 		return name;
 	}
 	
@@ -123,6 +130,14 @@ public class SelectionGUI extends JFrame {
 
 	public static ArrayList<Coord> getShips() {
 		return shipLocations;
+	}
+	
+	public static ArrayList<String> shipCoord() {
+		return shipCoordinates;
+	}
+
+	public static ArrayList<String> orientations() {
+		return orientations;
 	}
 
 	public class InGame extends JPanel {
@@ -207,7 +222,7 @@ public class SelectionGUI extends JFrame {
 			graphic.setColor(Color.white);
 			graphic.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 35));
 
-			graphic.drawChars(name.toCharArray(), 0, name.length(), 10, 50);
+			graphic.drawChars(title.toCharArray(), 0, title.length(), 10, 50);
 		}
 		
 		public void placeInGrid() {
@@ -266,8 +281,8 @@ public class SelectionGUI extends JFrame {
 						}
 						
 						else if(i < 7 && currentShip == 1 && notInAirship(BATTLESHIP_SIZE)) {
-							System.out.println("current location!: " + shipLocations.get(0).getGridLocation());
-							System.out.println("TESTING COORDSSS: " + (char) (shipGridX) + "" + (Integer.valueOf(shipGridY) + 3));								
+							//System.out.println("current location!: " + shipLocations.get(0).getGridLocation());
+							//System.out.println("TESTING COORDSSS: " + (char) (shipGridX) + "" + (Integer.valueOf(shipGridY) + 3));								
 							centerX = ((i * 80) + RIGHT_BORDER) - 24;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 85;			
 						}
@@ -387,8 +402,6 @@ public class SelectionGUI extends JFrame {
 					!shipLocations.get(3).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
 					!shipLocations.get(3).getGridLocation().equals((char) (shipGridX - 2) + shipGridY);
 		}
-
-
 
 		private void chooseLocations(Graphics graphic) {
 			int i;
@@ -541,6 +554,8 @@ public class SelectionGUI extends JFrame {
 		public void confirmedLocation() {
 			if(confirmed == 1 && currentShip == 0) {
 				shipLocations.add(0, new Coord(centerX - 60, centerY - 65, (char) shipGridX, shipGridY, orientation));
+				shipCoordinates.add(0, shipGridX + shipGridY);
+				orientations.add(0, String.valueOf(rotateShip));
 				//resets x and y so that the new ship does go under the original ship locked in
 				centerX = 0;
 				centerY = 0;
@@ -552,7 +567,9 @@ public class SelectionGUI extends JFrame {
 			}
 			
 			else if(confirmed == 2 && currentShip == 1) {
-				shipLocations.add(1, new Coord(centerX - 60, centerY - 65, (char) shipGridX,shipGridY, orientation)); 
+				shipLocations.add(1, new Coord(centerX - 60, centerY - 65, (char) shipGridX,shipGridY, orientation));
+				shipCoordinates.add(1, shipGridX + shipGridY); 
+				orientations.add(1, String.valueOf(rotateShip));
 				centerX = 0;
 				centerY = 0;
 				orientation = 0;
@@ -565,6 +582,8 @@ public class SelectionGUI extends JFrame {
 			
 			else if(confirmed == 3 && currentShip == 2) {
 				shipLocations.add(2, new Coord(centerX - 63, centerY - 65, (char) shipGridX, shipGridY, orientation)); 
+				shipCoordinates.add(2, shipGridX + shipGridY);
+				orientations.add(2, String.valueOf(rotateShip));
 				centerX = 0;
 				centerY = 0;
 				orientation = 0;
@@ -577,6 +596,8 @@ public class SelectionGUI extends JFrame {
 			
 			else if(confirmed == 4 && currentShip == 3) {
 				shipLocations.add(3, new Coord(centerX - 65, centerY - 62, (char) shipGridX, shipGridY, orientation)); 
+				shipCoordinates.add(3, shipGridX + shipGridY);
+				orientations.add(3, String.valueOf(rotateShip));
 				centerX = 0;
 				centerY = 0;
 				orientation = 0;
@@ -589,6 +610,8 @@ public class SelectionGUI extends JFrame {
 			
 			else if(confirmed == 5 && currentShip == 4) {
 				shipLocations.add(4, new Coord(centerX, centerY - 60, (char) shipGridX, shipGridY, orientation)); 
+				shipCoordinates.add(4, shipGridX + shipGridY);
+				orientations.add(4, String.valueOf(rotateShip));
 				centerX = 0;
 				centerY = 0;
 				rotateShip = false;
@@ -657,7 +680,7 @@ public class SelectionGUI extends JFrame {
 			if(firstCoord() != '0' &&  !secondCoord().equals("-1")) {
 				shipGridX = firstCoord();
 				shipGridY = secondCoord();
-				System.out.println("Ship X: " + shipGridX + " Ship Y: " + shipGridY);
+			//	System.out.println("Ship X: " + shipGridX + " Ship Y: " + shipGridY);
 			}
 
 			repaint();
@@ -709,7 +732,7 @@ public class SelectionGUI extends JFrame {
 				else
 					shipIsVertical = true;
 
-				System.out.println("ITS TRUE");
+				//System.out.println("ITS TRUE");
 				rotateShip = true;
 				orientation = (orientation + 1) % 4;
 			}
@@ -750,7 +773,7 @@ public class SelectionGUI extends JFrame {
 				confirmedLocation = false;
 
 			if(mouseOnRotate()) {
-				System.out.println("ITS FALSE");
+				//System.out.println("ITS FALSE");
 				rotateShip = false;
 			}
 

@@ -19,9 +19,11 @@ public class ServerListener implements Runnable {
         try {
             input = new Scanner(socket.getInputStream());
             /*if socket is not closed and server has a next line*/
-            while (!socket.isClosed() && input.hasNextLine()) {
-                String chatTxt = input.nextLine();
-                System.out.println(chatTxt);
+            while (!socket.isClosed()) {
+                String text = input.nextLine();
+                System.out.println(text);
+                if(text != "/gameover")
+                    System.out.println("YOUWon!");
             }
         } catch (IOException e) {
             e.printStackTrace();

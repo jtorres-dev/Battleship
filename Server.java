@@ -8,7 +8,7 @@ import java.net.Socket;
 public class Server extends Thread { 
   	/* port for the server */
   	private final int port;
-
+    private int playerCount = 0;
   	/* 
   		Vector for thread safety when accessing data together. 
   		This will keep track of all the helpers created to communicate 
@@ -27,7 +27,7 @@ public class Server extends Thread {
 
   	/* removes a helper when user decides to logout */
   	public void removeHelper(ServerHelper helper) {
-  		helpers.remove(helper);
+  	  helpers.remove(helper);
   	}
   	
   	@Override
@@ -42,7 +42,7 @@ public class Server extends Thread {
 	      		/* creates connection between server and client. client socket is returned */	
 	      		Socket csocket = socket.accept();
 	      		/* initializes a server helper to be able to handle client communication individually */
-	      		ServerHelper helper = new ServerHelper(this, csocket);
+	      		ServerHelper helper = new ServerHelper(this, csocket, ++playerCount);
 	      		/* adds this instance as a helper in helpers list to keep track of all helpers */
 	      		helpers.add(helper);
 	      		/* starts helper thread */

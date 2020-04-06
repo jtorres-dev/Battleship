@@ -117,9 +117,9 @@ public class GUI extends JFrame {
 				for(int j = 0; j < 10; j++) {
 					graphic.setColor(new Color(122, 189, 255));
 
-					if(mouseX >= (i * 80) + LEFT_BORDER && mouseX < (i * 80) + RIGHT_BORDER &&
-					   mouseY >= (j * 80) + TOP_BORDER  && mouseY < (j * 80) + BOTTOM_BORDER)
-						graphic.setColor(Color.gray);
+					// if(mouseX >= (i * 80) + LEFT_BORDER && mouseX < (i * 80) + RIGHT_BORDER &&
+					//    mouseY >= (j * 80) + TOP_BORDER  && mouseY < (j * 80) + BOTTOM_BORDER)
+					// 	graphic.setColor(Color.gray);
 				
 					graphic.fillRect((spacing + i * 80 + 765), (spacing + j * 80 + 45), 78, 78);
 
@@ -245,7 +245,7 @@ public class GUI extends JFrame {
 			graphic.setColor(Color.white);
 			graphic.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 35));
 
-			char[] title = "Player 1:".toCharArray();
+			char[] title = (name + ": ").toCharArray();
 			graphic.drawChars(title, 0, 9, 5, 385);
 
 
@@ -301,15 +301,15 @@ public class GUI extends JFrame {
 		public void mouseMoved(MouseEvent event) {
 			mouseX = event.getX();
 			mouseY = event.getY();
-			System.out.println("mouseX: " + mouseX + " mouseY: " + mouseY);
+		//	System.out.println("mouseX: " + mouseX + " mouseY: " + mouseY);
 		}
 	}
 
 	public class MouseAction implements MouseListener {
 		@Override
 		public void mouseClicked(MouseEvent event) {
-			if(firstCoord() != -1 &&  secondCoord() != -1)
-				System.out.println("In box: [" + (char) firstCoord() + ", " + secondCoord() + "]");
+			//if(firstCoord() != -1 &&  secondCoord() != -1)
+		//		System.out.println("In box: [" + (char) firstCoord() + ", " + secondCoord() + "]");
 		}
 
 		@Override
