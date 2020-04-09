@@ -39,6 +39,7 @@ public class GUI extends JFrame {
 
 
 	private static ArrayList<Coord> shipLocations;
+	private static ArrayList<String> orientations;
 
 
 	private final int LEFT_BORDER = 774;
@@ -52,7 +53,8 @@ public class GUI extends JFrame {
 	private final int MINI_BOTTOM_BORDER = 102;
  
 
-	public GUI(String name, ArrayList<Coord> shipLocations) {
+	public GUI(String name, ArrayList<Coord> shipLocations, ArrayList<String> orientations) {
+		this.orientations = orientations;
 		this.name = name;
 		this.shipLocations = shipLocations;
 
@@ -68,17 +70,17 @@ public class GUI extends JFrame {
 		ships.add(8, getToolkit().getImage("./imgs/ships/destroyer/1.png"));
 		ships.add(9, getToolkit().getImage("./imgs/ships/submarine/1.png"));
 		
-		ships.add(10, getToolkit().getImage("./imgs/ships/airship/2.png"));
-		ships.add(11, getToolkit().getImage("./imgs/ships/battleship/2.png"));
-		ships.add(12, getToolkit().getImage("./imgs/ships/cruiser/2.png"));
-		ships.add(13, getToolkit().getImage("./imgs/ships/destroyer/2.png"));
-		ships.add(14, getToolkit().getImage("./imgs/ships/submarine/2.png"));
+		// ships.add(10, getToolkit().getImage("./imgs/ships/airship/2.png"));
+		// ships.add(11, getToolkit().getImage("./imgs/ships/battleship/2.png"));
+		// ships.add(12, getToolkit().getImage("./imgs/ships/cruiser/2.png"));
+		// ships.add(13, getToolkit().getImage("./imgs/ships/destroyer/2.png"));
+		// ships.add(14, getToolkit().getImage("./imgs/ships/submarine/2.png"));
 		
-		ships.add(15, getToolkit().getImage("./imgs/ships/airship/3.png"));
-		ships.add(16, getToolkit().getImage("./imgs/ships/battleship/3.png"));
-		ships.add(17, getToolkit().getImage("./imgs/ships/cruiser/3.png"));
-		ships.add(18, getToolkit().getImage("./imgs/ships/destroyer/3.png"));
-		ships.add(19, getToolkit().getImage("./imgs/ships/submarine/3.png"));
+		// ships.add(15, getToolkit().getImage("./imgs/ships/airship/3.png"));
+		// ships.add(16, getToolkit().getImage("./imgs/ships/battleship/3.png"));
+		// ships.add(17, getToolkit().getImage("./imgs/ships/cruiser/3.png"));
+		// ships.add(18, getToolkit().getImage("./imgs/ships/destroyer/3.png"));
+		// ships.add(19, getToolkit().getImage("./imgs/ships/submarine/3.png"));
 
 		setTitle("Battleship");
 		setSize(1600, 900);
@@ -108,21 +110,13 @@ public class GUI extends JFrame {
 			produceChat(graphic);
 			pOneShips(graphic);
 			pTwoShips(graphic);
-
-
 		}
 
 		private void produceGrid(Graphics graphic) {
 			for(int i = 0; i < 10; i++) {
 				for(int j = 0; j < 10; j++) {
 					graphic.setColor(new Color(122, 189, 255));
-
-					// if(mouseX >= (i * 80) + LEFT_BORDER && mouseX < (i * 80) + RIGHT_BORDER &&
-					//    mouseY >= (j * 80) + TOP_BORDER  && mouseY < (j * 80) + BOTTOM_BORDER)
-					// 	graphic.setColor(Color.gray);
-				
 					graphic.fillRect((spacing + i * 80 + 765), (spacing + j * 80 + 45), 78, 78);
-
 				}
 			}
 		}
@@ -168,8 +162,14 @@ public class GUI extends JFrame {
 		}
 
 		private void produceLayout(Graphics graphic) {
-			for(int i = 0;  i < shipLocations.size(); i++)
-				graphic.drawImage(ships.get(i), shipLocations.get(i).shipsX() , shipLocations.get(i).shipsY(), null);
+			for(int i = 0;  i < shipLocations.size(); i++) {
+				//if vertical
+				if(Boolean.parseBoolean(orientations.get(i)))
+					// draw image vertically
+					graphic.drawImage(ships.get(i), shipLocations.get(i).shipsX() , shipLocations.get(i).shipsY(), null);
+				else
+					graphic.drawImage(ships.get(i + 5), shipLocations.get(i).shipsX() , shipLocations.get(i).shipsY(), null);
+			}
 		}
 
 		private void produceMiniMap(Graphics graphic) {

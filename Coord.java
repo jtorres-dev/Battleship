@@ -2,11 +2,11 @@ public class Coord {
 	
 	private final int x;
 	private final int y;
-	private final char gridX;
+	private final String gridX;
 	private final String gridY;
 	private final int orientation;
 
-	public Coord(int x, int y, char gridX, String gridY, int orientation) {
+	public Coord(int x, int y, String gridX, String gridY, int orientation) {
 		this.x = x;
 		this.y = y;
 		this.gridX = gridX;
@@ -22,7 +22,7 @@ public class Coord {
 		return y;
 	}
 
-	public char getGridX() {
+	public String getGridX() {
 		return gridX;
 	}
 

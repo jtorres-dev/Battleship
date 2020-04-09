@@ -217,7 +217,7 @@ public class ServerHelper extends Thread {
     		p1Locations[i][0] = p1Ships.get(i);
     	
     	// if true, its horizontal
-    	if(!p1Orientations.get(0)) {
+    	if(p1Orientations.get(0)) {
 	    	for(int i = 1; i < 5; i++) 
 	    		p1Locations[0][i] = ((char)(p1Ships.get(0).charAt(0) + i)) + "" +  p1Ships.get(0).charAt(1);
     	} else {
@@ -225,7 +225,7 @@ public class ServerHelper extends Thread {
 	    		p1Locations[0][i] = (p1Ships.get(0).charAt(0) + "" +  (char)(p1Ships.get(0).charAt(1) + i));
     	}
 
-    	if(!p1Orientations.get(1)) {
+    	if(p1Orientations.get(1)) {
 	    	for(int i = 1; i < 4; i++) 
 	    		p1Locations[1][i] = ((char)(p1Ships.get(1).charAt(0) + i)) + "" +  p1Ships.get(1).charAt(1);
     	} else {
@@ -233,7 +233,7 @@ public class ServerHelper extends Thread {
 	    		p1Locations[1][i] = (p1Ships.get(1).charAt(0) + "" +  (char)(p1Ships.get(1).charAt(1) + i));
     	}   
 
-    	if(!p1Orientations.get(2)) {
+    	if(p1Orientations.get(2)) {
 	    	for(int i = 1; i < 3; i++) 
 	    		p1Locations[2][i] = ((char)(p1Ships.get(2).charAt(0) + i)) + "" +  p1Ships.get(2).charAt(1);
     	} else {
@@ -241,7 +241,7 @@ public class ServerHelper extends Thread {
 	    		p1Locations[2][i] = (p1Ships.get(2).charAt(0) + "" +  (char)(p1Ships.get(2).charAt(1) + i));
     	}    	
 
-    	if(!p1Orientations.get(3)) {
+    	if(p1Orientations.get(3)) {
 	    	for(int i = 1; i < 3; i++) 
 	    		p1Locations[3][i] = ((char)(p1Ships.get(3).charAt(0) + i)) + "" +  p1Ships.get(3).charAt(1);
     	} else {
@@ -249,7 +249,7 @@ public class ServerHelper extends Thread {
 	    		p1Locations[3][i] = (p1Ships.get(3).charAt(0) + "" +  (char)(p1Ships.get(3).charAt(1) + i));
     	}    	
 
-    	if(!p1Orientations.get(4)) {
+    	if(p1Orientations.get(4)) {
 	    	for(int i = 1; i < 2; i++) 
 	    		p1Locations[4][i] = ((char)(p1Ships.get(4).charAt(0) + i)) + "" +  p1Ships.get(4).charAt(1);
     	} else {

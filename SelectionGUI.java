@@ -15,17 +15,18 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class SelectionGUI extends JFrame {
-	private int spacing = 1; /* for lines in grid */
-	private int mouseX, mouseY, lastX, lastY;
-	private int fixedY, fixedX;
-	private int draggedX, draggedY;
-	private int centerX, centerY;
-	private char shipGridX;
-	private String shipGridY;
 	
-	private boolean ifFinished;
-	
-	private List<Image> ships = new ArrayList<Image>();
+	private final int AIRSHIP    = 5;
+	private final int BATTLESHIP = 4;
+	private final int CRUISER    = 3;
+	private final int DESTROYER  = 3;
+	private final int SUBMARINE  = 2;
+
+	private final int LEFT_BORDER   = 774;
+	private final int RIGHT_BORDER  = 851;
+	private final int TOP_BORDER    = 76;
+	private final int BOTTOM_BORDER = 155;
+
 	private static ArrayList<Coord> shipLocations = new ArrayList<Coord>();
 	private static ArrayList<String> shipCoordinates = new ArrayList<String>();
 	private static ArrayList<String> orientations = new ArrayList<String>();
@@ -43,29 +44,33 @@ public class SelectionGUI extends JFrame {
 	private static boolean selectingSubmarine  = false;
 	private static boolean confirmedLocation   = false;
 
-	private final int AIRSHIP_SIZE    = 5;
-	private final int BATTLESHIP_SIZE = 4;
-	private final int CRUISER_SIZE    = 3;
-	private final int DESTROYER_SIZE  = 3;
-	private final int SUBMARINE_SIZE  = 2;
-
+	private static String[][] boundaries = new String[5][5];
 
 	private static boolean shipIsVertical = true;	
 	private static boolean moved, moved1, moved2, moved3, moved4 = false;
 	private static int orientation = 0;
 
+	private int spacing = 1; /* for lines in grid */
+	private int mouseX, mouseY, lastX, lastY;
+	private int fixedY, fixedX;
+	private int draggedX, draggedY;
+	private int centerX, centerY;
+	private String shipGridX;
+	private String shipGridY;
+	
+	private boolean ifFinished;
+	
+
 	private boolean dragging = false;
 	private boolean pressed = false;
 	private boolean rotateShip = false;
 
-	private final int LEFT_BORDER   = 774;
-	private final int RIGHT_BORDER  = 851;
-	private final int TOP_BORDER    = 76;
-	private final int BOTTOM_BORDER = 155;
+	private List<Image> ships = new ArrayList<Image>();
 
 
 	public SelectionGUI() {
 		ifFinished = false;
+		
 		setTitle("Battleship");
 		setSize(1600, 900);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -96,6 +101,18 @@ public class SelectionGUI extends JFrame {
 
 	public String getName() {
 		return name;
+	}
+
+	public static ArrayList<Coord> getShips() {
+		return shipLocations;
+	}
+	
+	public static ArrayList<String> shipCoord() {
+		return shipCoordinates;
+	}
+
+	public static ArrayList<String> orientations() {
+		return orientations;
 	}
 	
 	private void storeShips() {
@@ -128,30 +145,20 @@ public class SelectionGUI extends JFrame {
 		ships.add(19, getToolkit().getImage("./imgs/ships/submarine/3.png"));
 	}
 
-	public static ArrayList<Coord> getShips() {
-		return shipLocations;
-	}
-	
-	public static ArrayList<String> shipCoord() {
-		return shipCoordinates;
-	}
-
-	public static ArrayList<String> orientations() {
-		return orientations;
-	}
-
 	public class InGame extends JPanel {
 		
 		public void paintComponent(Graphics graphic) {
-
 			/* main background color (navyish) */
 			graphic.setColor(new Color(40, 69, 114));
 		
 			graphic.fillRect(0, 0, 1600, 900);
+
 			produceGrid(graphic);
 			produceAxisTitles(graphic);
+
 			if(name != "") {
 				showName(graphic);
+				
 				if(currentShip < 5) {
 					chooseLocations(graphic);
 					confirmedLocation();
@@ -167,13 +174,7 @@ public class SelectionGUI extends JFrame {
 			for(int i = 0; i < 10; i++) {
 				for(int j = 0; j < 10; j++) {
 					graphic.setColor(new Color(122, 189, 255));
-
-					// if(mouseX >= (i * 80) + LEFT_BORDER && mouseX < (i * 80) + RIGHT_BORDER &&
-					//    mouseY >= (j * 80) + TOP_BORDER  && mouseY < (j * 80) + BOTTOM_BORDER)
-					// 	graphic.setColor(Color.gray);
-				
 					graphic.fillRect((spacing + i * 80 + 765), (spacing + j * 80 + 45), 78, 78);
-
 				}
 			}
 		}
@@ -187,7 +188,6 @@ public class SelectionGUI extends JFrame {
 			List<Image> oneThruTen = new ArrayList<Image>();
 
 			for(int i = 1; i <= 10; i++) 
-				/* Image img = getToolkit().getImage("node.jpg"); */
 				oneThruTen.add(getToolkit().getImage("./imgs/coordinates/"+i+".png"));
 			
 			int box = 0;
@@ -221,7 +221,6 @@ public class SelectionGUI extends JFrame {
 		private void showName(Graphics graphic) {
 			graphic.setColor(Color.white);
 			graphic.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 35));
-
 			graphic.drawChars(title.toCharArray(), 0, title.length(), 10, 50);
 		}
 		
@@ -242,25 +241,25 @@ public class SelectionGUI extends JFrame {
 						
 						if(j < 6 && currentShip == 0) {	
 							centerX = ((i * 80) + RIGHT_BORDER) - 64;
-							centerY = ((j * 80) + BOTTOM_BORDER) - 47;			
+							centerY = ((j * 80) + BOTTOM_BORDER) - 47;
 						}
 						
-						else if(j < 7 && currentShip == 1 && notInAirship(BATTLESHIP_SIZE)) {								
+						else if(j < 7 && currentShip == 1 && notInAirship(BATTLESHIP)) {								
 							centerX = ((i * 80) + RIGHT_BORDER) - 64;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 47;			
 						}
 						
-						else if(j < 8 && currentShip == 2 && notInAirship(CRUISER_SIZE) && notInBattleship(CRUISER_SIZE)) {
+						else if(j < 8 && currentShip == 2 && notInAirship(CRUISER) && notInBattleship(CRUISER)) {
 							centerX = ((i * 80) + RIGHT_BORDER) - 64;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 47;			
 						}
 						
-						else if(j < 8 && currentShip == 3 && notInAirship(DESTROYER_SIZE) && notInBattleship(DESTROYER_SIZE) && notInCruiser(DESTROYER_SIZE)) {	
+						else if(j < 8 && currentShip == 3 && notInAirship(DESTROYER) && notInBattleship(DESTROYER) && notInCruiser(DESTROYER)) {	
 							centerX = ((i * 80) + RIGHT_BORDER) - 64;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 47;			
 						}
 						
-						else if(j < 9 && currentShip == 4 && notInAirship(SUBMARINE_SIZE) && notInBattleship(SUBMARINE_SIZE) && notInCruiser(SUBMARINE_SIZE) && notInDestroyer()) {
+						else if(j < 9 && currentShip == 4 && notInAirship(SUBMARINE) && notInBattleship(SUBMARINE) && notInCruiser(SUBMARINE) && notInDestroyer(SUBMARINE)) {
 							centerX = ((i * 80) + RIGHT_BORDER) - 64;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 47;			
 						}
@@ -280,24 +279,24 @@ public class SelectionGUI extends JFrame {
 							centerY = ((j * 80) + BOTTOM_BORDER) - 85;			
 						}
 						
-						else if(i < 7 && currentShip == 1 && notInAirship(BATTLESHIP_SIZE)) {
+						else if(i < 7 && currentShip == 1 && notInAirship(BATTLESHIP)) {
 							//System.out.println("current location!: " + shipLocations.get(0).getGridLocation());
 							//System.out.println("TESTING COORDSSS: " + (char) (shipGridX) + "" + (Integer.valueOf(shipGridY) + 3));								
 							centerX = ((i * 80) + RIGHT_BORDER) - 24;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 85;			
 						}
 						
-						else if(i < 8 && currentShip == 2 && notInAirship(CRUISER_SIZE) && notInBattleship(CRUISER_SIZE)) {
+						else if(i < 8 && currentShip == 2 && notInAirship(CRUISER) && notInBattleship(CRUISER)) {
 							centerX = ((i * 80) + RIGHT_BORDER) - 24;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 85;			
 						}
 						
-						else if(i < 8 && currentShip == 3 && notInAirship(DESTROYER_SIZE) && notInBattleship(DESTROYER_SIZE) && notInCruiser(DESTROYER_SIZE)) {	
+						else if(i < 8 && currentShip == 3 && notInAirship(DESTROYER) && notInBattleship(DESTROYER) && notInCruiser(DESTROYER)) {	
 							centerX = ((i * 80) + RIGHT_BORDER) - 24;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 85;			
 						}
 						
-						else if(i < 9 && currentShip == 4 && notInAirship(SUBMARINE_SIZE) && notInBattleship(SUBMARINE_SIZE) && notInCruiser(SUBMARINE_SIZE) && notInDestroyer()) {
+						else if(i < 9 && currentShip == 4 && notInAirship(SUBMARINE) && notInBattleship(SUBMARINE) && notInCruiser(SUBMARINE) && notInDestroyer(SUBMARINE)) {
 							centerX = ((i * 80) + RIGHT_BORDER) - 85;
 							centerY = ((j * 80) + BOTTOM_BORDER) - 25;			
 						}
@@ -306,101 +305,149 @@ public class SelectionGUI extends JFrame {
 			}
 		}
 
-		private boolean notInAirship(int size) {
-			if(size == BATTLESHIP_SIZE) {
-				/* if ship is vertical */
-				if(shipLocations.get(0).orientation() % 2 == 0)
-					return 	!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 3) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 3) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 4) + shipGridY);
-				else
-					return 	!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 3) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 3) + shipGridY) &&
-							!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 4) + shipGridY);
+		private boolean notInAirship(int ship) {
+			char bottomOfShip;
+			char maxHeight;
+			char minHeight;
+			//shipGridX is a string, so to represent it as a character it must be used as .charAt(0)
+			if(ship == BATTLESHIP) {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 3);
+				maxHeight = (char) (boundaries[0][0].charAt(0) - 3);
+				minHeight = boundaries[0][0].charAt(0);
+
+				// System.out.println("maxHeight: " + maxHeight);
+				// System.out.println("minHeight: " + minHeight);
 			}
+			else if(ship == CRUISER) {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 2);
+				maxHeight = (char) (boundaries[0][0].charAt(0) - 2);
+				minHeight = boundaries[0][0].charAt(0);
+			
+			}
+			else if(ship == DESTROYER) {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 2);
+				maxHeight = (char) (boundaries[0][0].charAt(0) - 2);
+				minHeight = boundaries[0][0].charAt(0);
+			}
+			else {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 1);
+				maxHeight = (char) (boundaries[0][0].charAt(0) - 1);
+				minHeight = boundaries[0][0].charAt(0);
+			}
+			
+			/* if ship is vertical */
+			if(orientations.get(0).equals("true")) {
+				for(int i = 0; i < 5; i++) {
+					if(shipGridX.charAt(0) == boundaries[0][i].charAt(0) && shipGridY.charAt(0) == boundaries[0][0].charAt(1) ||
+					  (boundaries[0][i].charAt(0) == bottomOfShip && shipGridY.charAt(0) == boundaries[0][0].charAt(1)))
+						return false;
+				}
+			}
+			else { /* else ship is horizontal, returns false if the ship overlaps */
+				for(int i = 0; i < 5; i++) {
+					if(shipGridX.charAt(0) == boundaries[0][0].charAt(0) && shipGridY.charAt(0) == boundaries[0][i].charAt(1) ||
+					  (shipGridX.charAt(0) >= maxHeight && shipGridX.charAt(0) <= minHeight && shipGridY.charAt(0) == boundaries[0][i].charAt(1)))
+						return false;
+				}
+			}
+			return true;
+		}
 
+		private boolean notInBattleship(int ship) {
+			char bottomOfShip;
+			char maxHeight;
+			char minHeight;
 
-
-			else if(size == CRUISER_SIZE)
-				return	!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 3) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 4) + shipGridY);	
-			else if(size == DESTROYER_SIZE)
-				return	!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 3) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 4) + shipGridY);
-			else 
-				return	!shipLocations.get(0).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 3) + shipGridY) &&
-						!shipLocations.get(0).getGridLocation().equals((char) (shipGridX - 4) + shipGridY);
+			if(ship == CRUISER) {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 2);
+				maxHeight = (char) (boundaries[1][0].charAt(0) - 2);
+				minHeight = boundaries[1][0].charAt(0);
+			
+			}
+			else if(ship == DESTROYER) {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 2);
+				maxHeight = (char) (boundaries[1][0].charAt(0) - 2);
+				minHeight = boundaries[1][0].charAt(0);
+			}
+			else {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 1);
+				maxHeight = (char) (boundaries[1][0].charAt(0) - 1);
+				minHeight = boundaries[1][0].charAt(0);
+			}
+			
+			/* if ship is vertical */
+			if(orientations.get(1).equals("true")) {
+				for(int i = 0; i < 4; i++) {
+					if(shipGridX.charAt(0) == boundaries[1][i].charAt(0) && shipGridY.charAt(0) == boundaries[1][0].charAt(1) ||
+					  (boundaries[1][i].charAt(0) == bottomOfShip && shipGridY.charAt(0) == boundaries[1][0].charAt(1)))
+						return false;
+				}
+			}
+			else { /* else ship is horizontal, returns false if the ship overlaps */
+				for(int i = 0; i < 4; i++) {
+					if(shipGridX.charAt(0) == boundaries[1][0].charAt(0) && shipGridY.charAt(0) == boundaries[1][i].charAt(1) ||
+					  (shipGridX.charAt(0) >= maxHeight && shipGridX.charAt(0) <= minHeight && shipGridY.charAt(0) == boundaries[1][i].charAt(1)))
+						return false;
+				}
+			}
+			return true;
 		}
 		
-		private boolean notInBattleship(int size) {
-			if(size == CRUISER_SIZE)
-				return	!shipLocations.get(1).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 3) + shipGridY);
+		private boolean notInCruiser(int ship) {
+			char bottomOfShip;
+			char maxHeight;
+			char minHeight;
+
+			if(ship == DESTROYER) {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 2);
+				maxHeight = (char) (boundaries[2][0].charAt(0) - 2);
+				minHeight = boundaries[2][0].charAt(0);
+			}
+			else {
+				bottomOfShip = (char)(shipGridX.charAt(0) + 1);
+				maxHeight = (char) (boundaries[2][0].charAt(0) - 1);
+				minHeight = boundaries[2][0].charAt(0);
+			}
 			
-			else if(size == DESTROYER_SIZE)
-				return	!shipLocations.get(1).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 3) + shipGridY);
-			
-			else 
-				return	!shipLocations.get(1).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 2) + shipGridY) &&
-						!shipLocations.get(1).getGridLocation().equals((char) (shipGridX - 3) + shipGridY);
+			/* if ship is vertical */
+			if(orientations.get(2).equals("true")) {
+				for(int i = 0; i < 3; i++) {
+					if(shipGridX.charAt(0) == boundaries[2][i].charAt(0) && shipGridY.charAt(0) == boundaries[2][0].charAt(1) ||
+					  (boundaries[2][i].charAt(0) == bottomOfShip && shipGridY.charAt(0) == boundaries[2][0].charAt(1)))
+						return false;
+				}
+			}
+			else { /* else ship is horizontal, returns false if the ship overlaps */
+				for(int i = 0; i < 3; i++) {
+					if(shipGridX.charAt(0) == boundaries[2][0].charAt(0) && shipGridY.charAt(0) == boundaries[2][i].charAt(1) ||
+					  (shipGridX.charAt(0) >= maxHeight && shipGridX.charAt(0) <= minHeight && shipGridY.charAt(0) == boundaries[2][i].charAt(1)))
+						return false;
+				}
+			}
+			return true;
 		}
 		
-		private boolean notInCruiser(int size) {
-			if(size == DESTROYER_SIZE)
-				return	!shipLocations.get(2).getGridLocation().equals((char) (shipGridX + 2) + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals((char) (shipGridX - 2) + shipGridY);
+		private boolean notInDestroyer(int ship) {
+			char bottomOfShip = (char)(shipGridX.charAt(0) + 1);
+			char maxHeight = (char) (boundaries[3][0].charAt(0) - 1);
+			char minHeight = boundaries[3][0].charAt(0);
 			
-			else 
-				return	!shipLocations.get(2).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-						!shipLocations.get(2).getGridLocation().equals((char) (shipGridX - 2) + shipGridY);
-		}
-		
-		private boolean notInDestroyer() {
-			return	!shipLocations.get(3).getGridLocation().equals((char) (shipGridX + 1) + shipGridY) &&
-					!shipLocations.get(3).getGridLocation().equals(		   shipGridX      + shipGridY) &&
-					!shipLocations.get(3).getGridLocation().equals((char) (shipGridX - 1) + shipGridY) &&
-					!shipLocations.get(3).getGridLocation().equals((char) (shipGridX - 2) + shipGridY);
+			/* if ship is vertical */
+			if(orientations.get(3).equals("true")) {
+				for(int i = 0; i < 3; i++) {
+					if(shipGridX.charAt(0) == boundaries[3][i].charAt(0) && shipGridY.charAt(0) == boundaries[3][0].charAt(1) ||
+					  (boundaries[3][i].charAt(0) == bottomOfShip && shipGridY.charAt(0) == boundaries[3][0].charAt(1)))
+						return false;
+				}
+			}
+			else { /* else ship is horizontal, returns false if the ship overlaps */
+				for(int i = 0; i < 3; i++) {
+					if(shipGridX.charAt(0) == boundaries[3][0].charAt(0) && shipGridY.charAt(0) == boundaries[3][i].charAt(1) ||
+					  (shipGridX.charAt(0) >= maxHeight && shipGridX.charAt(0) <= minHeight && shipGridY.charAt(0) == boundaries[3][i].charAt(1)))
+						return false;
+				}
+			}
+			return true;
 		}
 
 		private void chooseLocations(Graphics graphic) {
@@ -433,8 +480,6 @@ public class SelectionGUI extends JFrame {
 
 					else 
 						graphic.drawImage(ships.get(i * 5), 280, 70, null);	
-					
-
 					break;
 
 				case 1:	
@@ -553,23 +598,40 @@ public class SelectionGUI extends JFrame {
 
 		public void confirmedLocation() {
 			if(confirmed == 1 && currentShip == 0) {
-				shipLocations.add(0, new Coord(centerX - 60, centerY - 65, (char) shipGridX, shipGridY, orientation));
+				shipLocations.add(0, new Coord(centerX - 60, centerY - 65, shipGridX, shipGridY, orientation));
 				shipCoordinates.add(0, shipGridX + shipGridY);
-				orientations.add(0, String.valueOf(rotateShip));
+				
+				if(shipIsVertical)
+					for(int i = 0; i < 5; i++) 				
+						boundaries[0][i] = "" + (char)(shipGridX.charAt(0) + i) + shipGridY; 
+				else 
+					for(int i = 0; i < 5; i++) 				
+						boundaries[0][i] = shipGridX  + ( "" + (char)(shipGridY.charAt(0) + i)); 
+					
+				orientations.add(0, String.valueOf(shipIsVertical));
 				//resets x and y so that the new ship does go under the original ship locked in
-				centerX = 0;
-				centerY = 0;
+				centerX = 340; // resets to outside the grid for the user to grab
+				centerY = 205; // resets to outside the grid for the user to grab
 				orientation = 0;
 				rotateShip = false;
+				shipIsVertical = true;
 				selectingAirship = false;
 				selectingBattleship = true;
 				currentShip++;
 			}
 			
 			else if(confirmed == 2 && currentShip == 1) {
-				shipLocations.add(1, new Coord(centerX - 60, centerY - 65, (char) shipGridX,shipGridY, orientation));
+				shipLocations.add(1, new Coord(centerX - 60, centerY - 65, shipGridX,shipGridY, orientation));
 				shipCoordinates.add(1, shipGridX + shipGridY); 
-				orientations.add(1, String.valueOf(rotateShip));
+
+				if(shipIsVertical)
+					for(int i = 0; i < 5; i++) 				
+						boundaries[1][i] = "" + (char)(shipGridX.charAt(0) + i) + shipGridY; 
+				else 
+					for(int i = 0; i < 5; i++) 				
+						boundaries[1][i] = shipGridX  + ( "" + (shipGridY.charAt(0) + i));
+		
+				orientations.add(1, String.valueOf(shipIsVertical));
 				centerX = 0;
 				centerY = 0;
 				orientation = 0;
@@ -581,9 +643,17 @@ public class SelectionGUI extends JFrame {
 			}
 			
 			else if(confirmed == 3 && currentShip == 2) {
-				shipLocations.add(2, new Coord(centerX - 63, centerY - 65, (char) shipGridX, shipGridY, orientation)); 
+				shipLocations.add(2, new Coord(centerX - 63, centerY - 65, shipGridX, shipGridY, orientation)); 
 				shipCoordinates.add(2, shipGridX + shipGridY);
-				orientations.add(2, String.valueOf(rotateShip));
+
+				if(shipIsVertical)
+					for(int i = 0; i < 5; i++) 				
+						boundaries[2][i] = "" + (char)(shipGridX.charAt(0) + i) + shipGridY; 
+				else 
+					for(int i = 0; i < 5; i++) 				
+						boundaries[2][i] = shipGridX  + ( "" + (shipGridY.charAt(0) + i));
+		
+				orientations.add(2, String.valueOf(shipIsVertical));
 				centerX = 0;
 				centerY = 0;
 				orientation = 0;
@@ -595,9 +665,17 @@ public class SelectionGUI extends JFrame {
 			}
 			
 			else if(confirmed == 4 && currentShip == 3) {
-				shipLocations.add(3, new Coord(centerX - 65, centerY - 62, (char) shipGridX, shipGridY, orientation)); 
+				shipLocations.add(3, new Coord(centerX - 65, centerY - 62, shipGridX, shipGridY, orientation)); 
 				shipCoordinates.add(3, shipGridX + shipGridY);
-				orientations.add(3, String.valueOf(rotateShip));
+
+				if(shipIsVertical)
+					for(int i = 0; i < 5; i++) 				
+						boundaries[3][i] = "" + (char)(shipGridX.charAt(0) + i) + shipGridY; 
+				else 
+					for(int i = 0; i < 5; i++) 				
+						boundaries[3][i] = shipGridX  + ( "" + (shipGridY.charAt(0) + i));
+		
+				orientations.add(3, String.valueOf(shipIsVertical));
 				centerX = 0;
 				centerY = 0;
 				orientation = 0;
@@ -609,9 +687,17 @@ public class SelectionGUI extends JFrame {
 			}
 			
 			else if(confirmed == 5 && currentShip == 4) {
-				shipLocations.add(4, new Coord(centerX, centerY - 60, (char) shipGridX, shipGridY, orientation)); 
+				shipLocations.add(4, new Coord(centerX, centerY - 60, shipGridX, shipGridY, orientation)); 
 				shipCoordinates.add(4, shipGridX + shipGridY);
-				orientations.add(4, String.valueOf(rotateShip));
+
+				if(shipIsVertical)
+					for(int i = 0; i < 5; i++) 				
+						boundaries[4][i] = "" + (char)(shipGridX.charAt(0) + i) + shipGridY; 
+				else 
+					for(int i = 0; i < 5; i++) 				
+						boundaries[4][i] = shipGridX  + ( "" + (shipGridY.charAt(0) + i));
+		
+				orientations.add(4, String.valueOf(shipIsVertical));
 				centerX = 0;
 				centerY = 0;
 				rotateShip = false;
@@ -677,7 +763,7 @@ public class SelectionGUI extends JFrame {
 			draggedX = event.getX();
 			draggedY = event.getY();
 
-			if(firstCoord() != '0' &&  !secondCoord().equals("-1")) {
+			if(!firstCoord().equals("-1") &&  !secondCoord().equals("-1")) {
 				shipGridX = firstCoord();
 				shipGridY = secondCoord();
 			//	System.out.println("Ship X: " + shipGridX + " Ship Y: " + shipGridY);
@@ -695,16 +781,16 @@ public class SelectionGUI extends JFrame {
 
 
 		//used for last dragged image coords
-		private char firstCoord() {
+		private String firstCoord() {
 			for(int i = 0; i < 10; i++) {
 				for(int j = 0; j < 10; j++) {
 
 					if(draggedX >= (i * 80) + LEFT_BORDER && draggedX < (i * 80) + RIGHT_BORDER &&
 					   draggedY >= (j * 80) + TOP_BORDER  && draggedY < (j * 80) + BOTTOM_BORDER)
-						return (char) ('A' + j);
+						return "" + (char)('A' + j);
 				}
 			}
-			return '0';
+			return "-1";
 		}
 
 		//used for last dragged image coords

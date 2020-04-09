@@ -105,7 +105,7 @@ public class Battleship {
 
     	for(int i = 0; i < 5; i++) 
     		serverOut.write((orientations.get(i) + " ").getBytes());
-    	orientations.clear();
+    	//orientations.clear();
 
 		serverOut.write(("/done" + System.lineSeparator()).getBytes());
 		serverOut.flush();
